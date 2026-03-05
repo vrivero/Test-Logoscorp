@@ -6,21 +6,6 @@ const api = axios.create({
   baseURL: 'https://jsonplaceholder.typicode.com',
 });
 
-/*export const fetchUsers = async (): Promise<User[]> => {
-  const { data } = await api.get('/users');
-  
-  // Validamos y transformamos cada item del array
-  return data.map((item: any) => {
-    const result = UserTransformedSchema.safeParse(item);
-    if (!result.success) {
-      console.error('Error validando usuario:', result.error);
-      throw new Error('Data corruption from API');
-    }
-    return result.data;
-  });
-};*/
-
-
 export const fetchUsers = async (): Promise<User[]> => {
   const { data } = await api.get('/users');
   

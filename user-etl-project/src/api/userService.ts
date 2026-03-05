@@ -6,7 +6,7 @@ const api = axios.create({
   baseURL: 'https://jsonplaceholder.typicode.com',
 });
 
-export const fetchUsers = async (): Promise<User[]> => {
+/*export const fetchUsers = async (): Promise<User[]> => {
   const { data } = await api.get('/users');
   
   // Validamos y transformamos cada item del array
@@ -18,6 +18,21 @@ export const fetchUsers = async (): Promise<User[]> => {
     }
     return result.data;
   });
+};*/
+
+
+export const fetchUsers = async (): Promise<User[]> => {
+  const { data } = await api.get('/users');
+  
+  return data.map((item: any) => {
+    try {
+      return UserTransformedSchema.parse(item);
+    } catch (error) {
+      // Esto te dirá EXACTAMENTE qué usuario falló y por qué
+      console.error("Error validando usuario ID:", item.id, error);
+      return null; 
+    }
+  }).filter(Boolean) as User[]; // Filtramos los que fallaron
 };
 
 export const sendToExternalSystem = async (users: User | User[]) => {

@@ -12,10 +12,21 @@ const handleSyncSelected = async () => {
   const toSync = store.users.filter(u => store.selectedIds.includes(u.id));
   if (toSync.length === 0) return;
 
-  await transmitToZoho(toSync);
-  toSync.forEach(u => store.updateUser(u.id, { status: 'processed' }));
-  store.selectedIds = [];
-  alert('Sincronización masiva completada');
+  const summary = await transmitToZoho(toSync);
+
+  // Actualizamos el estado en Pinia solo para los que tuvieron éxito
+  summary.details.forEach(item => {
+    if (item.status === 'ok') {
+      store.updateUser(item.id, { status: 'processed' });
+    } else {
+      store.updateUser(item.id, { status: 'error' });
+    }
+  });
+
+  store.selectedIds = []; // Limpiamos selección
+  
+  // Feedback final
+  alert(`Proceso finalizado: ${summary.successCount} guardados, ${summary.errorCount} fallidos.`);
 };
 </script>
 
@@ -43,7 +54,14 @@ const handleSyncSelected = async () => {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="user in store.users" :key="user.id" :class="{ 'row-disabled': !user.isBusinessValid }">
+        <tr 
+          v-for="user in store.users" 
+          :key="user.id" 
+          :class="{ 
+            'row-disabled': !user.isBusinessValid, 
+            'row-error': user.status === 'error' 
+          }"
+        >
           <td>
             <input 
               type="checkbox" 
@@ -68,10 +86,44 @@ const handleSyncSelected = async () => {
 </template>
 
 <style scoped>
-.toolbar { margin-bottom: 15px; display: flex; justify-content: flex-end; }
-.row-disabled { background-color: #f1f1f1; color: #999; }
-.row-disabled td { opacity: 0.6; }
-.btn-sync { background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
-.btn-sync:disabled { background: #ccc; }
-.btn-edit { background: #6c757d; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+.toolbar { 
+   margin-bottom: 15px;
+   display: flex;
+   justify-content: flex-end;
+}
+.row-disabled { 
+  background-color: #f1f1f1;
+   color: #999;
+}
+.row-disabled td { 
+  opacity: 0.6;
+}
+.btn-sync { 
+  background: #28a745;
+   color: white;
+   border: none;
+   padding: 10px 20px;
+   border-radius: 4px;
+   cursor: pointer;
+   }
+.btn-sync:disabled { 
+  background: #ccc;
+}
+.btn-edit { 
+  background: #6c757d;
+   color: white;
+   border: none;
+   padding: 5px 10px;
+   border-radius: 4px;
+   cursor: pointer;
+}
+
+.btn-action.error {
+  background-color: #e53e3e;
+  color: white;
+}
+
+.row-error {
+  border-left: 4px solid #e53e3e;
+}
 </style>

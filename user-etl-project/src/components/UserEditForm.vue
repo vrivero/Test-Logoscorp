@@ -18,13 +18,15 @@ watch(() => props.user, (newVal) => {
 const handleSaveAndSend = async () => {
   if (!localUser.value) return;
   
-  try {
-    await transmitToZoho(localUser.value);
+  const result = await transmitToZoho(localUser.value);
+  
+  if (result.successCount > 0) {
     store.updateUser(localUser.value.id, { ...localUser.value, status: 'processed' });
-    alert('Guardado y enviado a Zoho');
+    alert('✅ Transmisión exitosa');
     emit('close');
-  } catch (e) {
-    alert('Error al sincronizar');
+  } else {
+    // Aquí mostramos el error simulado de la letra "C"
+    alert(`❌ Error: ${result.details[0].message}`);
   }
 };
 </script>

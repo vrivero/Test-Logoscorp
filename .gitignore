@@ -1,0 +1,36 @@
+# --- Dependencias de Node ---
+node_modules/
+**/node_modules/
+package-lock.json
+**/package-lock.json
+
+# --- Configuración y Secretos (CRÍTICO) ---
+# Bloqueamos el .env tanto en la raíz como en /proxy
+#.env
+#.env.*
+#proxy/.env
+#proxy/.env.local
+
+# --- Frontend (Vite / Vue) ---
+user-etl-project/dist/
+user-etl-project/dist-ssr/
+*.local
+
+# --- Logs y Debugging ---
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+proxy/*.log
+
+# --- IDEs y Editores ---
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# --- Sistema Operativo ---
+.DS_Store
+Thumbs.db
